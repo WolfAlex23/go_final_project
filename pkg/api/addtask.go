@@ -15,13 +15,13 @@ func checkDate(task *db.Task) error {
 	now := time.Now()
 
 	if task.Date == "" {
-		task.Date = now.Format(dateFormat)
+		task.Date = now.Format(DateFormat)
 	}
 
-	t, err := time.Parse(dateFormat, task.Date)
+	t, err := time.Parse(DateFormat, task.Date)
 
 	if err != nil {
-		return fmt.Errorf("неверный формат даты: %v", err)
+		return fmt.Errorf("invalid data format: %v", err)
 	}
 
 	var next string
@@ -29,16 +29,14 @@ func checkDate(task *db.Task) error {
 	if task.Repeat != "" {
 		next, err = NextDate(now, task.Date, task.Repeat)
 		if err != nil {
-			return fmt.Errorf("неправильное правило повторения: %v", err)
+			return fmt.Errorf("invalid repeat rule: %v", err)
 		}
 
 	}
 	if afterNow(now, t) {
 		if len(task.Repeat) == 0 {
-			// если правила повторения нет, то берём сегодняшнее число
-			task.Date = now.Format(dateFormat)
+			task.Date = now.Format(DateFormat)
 		} else {
-			// в противном случае, берём вычисленную ранее следующую дату
 			task.Date = next
 		}
 	}
@@ -52,17 +50,17 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Ошибка чтения тела запроса: %v", err)})
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("failed to read request body: %v", err)})
 		return
 	}
 
 	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
-		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Ошибка десериализации JSON: %v", err)})
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("JSON unmarshal error: %v", err)})
 		return
 	}
 
 	if task.Title == "" {
-		writeJson(w, http.StatusBadRequest, map[string]string{"error": "Не указан заголовок задачи"})
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": "task title missing"})
 		return
 	}
 
@@ -74,7 +72,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := db.AddTask(&task)
 
 	if err != nil {
-		writeJson(w, http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Ошибка добавления задачи: %v", err)})
+		writeJson(w, http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("task add failed: %v", err)})
 		return
 	}
 

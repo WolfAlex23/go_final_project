@@ -19,7 +19,7 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 	if now == "" {
 		timeNow = time.Now()
 	} else {
-		timeNow, err = time.Parse(dateFormat, now)
+		timeNow, err = time.Parse(DateFormat, now)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -36,8 +36,6 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", nextDate)
 
 }
-
-const dateFormat = "20060102"
 
 func afterNow(date, now time.Time) bool {
 	return date.Truncate(24 * time.Hour).After(now.Truncate(24 * time.Hour))
@@ -62,12 +60,12 @@ func lastDayInMonth(date time.Time) int {
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	if repeat == "" {
 
-		return "", fmt.Errorf("параметр правила не должен быть пустой")
+		return "", fmt.Errorf("rule should not be empty")
 	}
 
-	date, err := time.Parse(dateFormat, dstart)
+	date, err := time.Parse(DateFormat, dstart)
 	if err != nil {
-		return "", fmt.Errorf("неверный формат начальной даты: %v", err)
+		return "", fmt.Errorf("invalid start date format: %v", err)
 	}
 
 	ruleParts := strings.Split(repeat, " ")
@@ -77,15 +75,15 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	switch rule {
 	case "d":
 		if len(ruleParts) != 2 {
-			return "", fmt.Errorf("неверный формат правила: %v", err)
+			return "", fmt.Errorf("invalid rule format: %v", err)
 		}
 		interval, err := strconv.Atoi(ruleParts[1])
 		if err != nil {
-			return "", fmt.Errorf("ошибка преобразования интервала в число: %w", err)
+			return "", fmt.Errorf("failed to convert interval to number: %w", err)
 		}
 
 		if interval < 1 || interval > 400 {
-			return "", fmt.Errorf("неверное число дней переноса задачи")
+			return "", fmt.Errorf("invalid interval")
 		}
 
 		for {
@@ -97,7 +95,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 
 	case "y":
 		if len(ruleParts) != 1 {
-			return "", fmt.Errorf("неверный формат правила: %v", err)
+			return "", fmt.Errorf("invalid rule format: %v", err)
 		}
 		for {
 			date = date.AddDate(1, 0, 0)
@@ -109,7 +107,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	case "w":
 
 		if len(ruleParts) < 2 {
-			return "", fmt.Errorf("неверный формат правила: %v", err)
+			return "", fmt.Errorf("invalid rule format: %v", err)
 		}
 
 		daysStr := strings.Split(ruleParts[1], ",")
@@ -118,7 +116,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		for _, d := range daysStr {
 			i, _ := strconv.Atoi(d)
 			if i < 1 || i > 7 {
-				return "", fmt.Errorf("день указан некорректно: %v", err)
+				return "", fmt.Errorf("invalid day: %v", err)
 			}
 			daysIdx = append(daysIdx, i)
 		}
@@ -141,7 +139,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	case "m":
 
 		if len(ruleParts) < 2 {
-			return "", fmt.Errorf("неверный формат правила: %v", err)
+			return "", fmt.Errorf("invalid rule format: %v", err)
 		}
 
 		daysStr := strings.Split(ruleParts[1], ",")
@@ -149,10 +147,10 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		for _, d := range daysStr {
 			i, err := strconv.Atoi(d)
 			if err != nil {
-				return "", fmt.Errorf("не удалось преобразовать день '%s': %v", d, err)
+				return "", fmt.Errorf("failed to convert day '%s': %v", d, err)
 			}
 			if i < -2 || i > 31 {
-				return "", fmt.Errorf("день указан некорректно: %v", err)
+				return "", fmt.Errorf("дinvalid day: %v", err)
 			}
 			daysIdx = append(daysIdx, i)
 		}
@@ -189,10 +187,10 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 			for _, d := range monthStr {
 				i, err := strconv.Atoi(d)
 				if err != nil {
-					return "", fmt.Errorf("не удалось преобразовать месяц '%s': %v", d, err)
+					return "", fmt.Errorf("failed to convert month '%s': %v", d, err)
 				}
 				if i < 1 || i > 12 {
-					return "", fmt.Errorf("месяц указан некорректно: %v", err)
+					return "", fmt.Errorf("invalid month: %v", err)
 				}
 				monthIdx = append(monthIdx, i)
 			}
@@ -207,8 +205,8 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		}
 
 	default:
-		return "", fmt.Errorf("неверный формат правила: %v", err)
+		return "", fmt.Errorf("invalid rule format: %v", err)
 	}
-	return date.Format(dateFormat), err
+	return date.Format(DateFormat), err
 
 }

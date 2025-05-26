@@ -55,7 +55,7 @@ func Tasks(search string, limit int) ([]*Task, error) {
 
 	rows, err := db.Query(query, parameters...)
 	if err != nil {
-		return nil, fmt.Errorf("ошибка SELECT-запроса: %v", err)
+		return nil, fmt.Errorf("failed SELECT-request: %v", err)
 	}
 	defer rows.Close()
 
@@ -64,7 +64,7 @@ func Tasks(search string, limit int) ([]*Task, error) {
 
 		err := rows.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 		if err != nil {
-			return nil, fmt.Errorf("ошибка чтения данных строки: %v", err)
+			return nil, fmt.Errorf("row scan failed: %v", err)
 		}
 
 		tasks = append(tasks, &task)
@@ -83,9 +83,9 @@ func GetTask(id string) (*Task, error) {
 	err := db.QueryRow("SELECT id, date, title, comment, repeat FROM scheduler WHERE id = :id", sql.Named("id", id)).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("задача не найдена")
+			return nil, fmt.Errorf("task not found")
 		}
-		return nil, fmt.Errorf("ошибка чтения данных строки: %v", err)
+		return nil, fmt.Errorf("row scan failed: %v", err)
 	}
 	return task, nil
 }
@@ -100,7 +100,7 @@ func UpdateTask(task *Task) error {
 		sql.Named("repeat", task.Repeat),
 		sql.Named("id", task.ID))
 	if err != nil {
-		return fmt.Errorf("ошибка обновления задачи: %v", err)
+		return fmt.Errorf("task update failed: %v", err)
 	}
 	// метод RowsAffected() возвращает количество записей к которым
 	// был применена SQL команда
@@ -118,7 +118,7 @@ func DeleteTask(id string) error {
 
 	res, err := db.Exec("DELETE FROM scheduler WHERE id = :id", sql.Named("id", id))
 	if err != nil {
-		return fmt.Errorf("ошибка удаления задачи: %v", err)
+		return fmt.Errorf("task delete failed: %v", err)
 	}
 	count, err := res.RowsAffected()
 	if err != nil {
@@ -137,7 +137,7 @@ func UpdateDate(next string, id string) error {
 		sql.Named("date", next),
 		sql.Named("id", id))
 	if err != nil {
-		return fmt.Errorf("ошибка обновления даты задачи: %v", err)
+		return fmt.Errorf("failed to update task date: %v", err)
 	}
 	// метод RowsAffected() возвращает количество записей к которым
 	// был применена SQL команда

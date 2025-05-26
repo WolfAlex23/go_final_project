@@ -32,20 +32,20 @@ func Init(dbFile string) error {
 	} else if err != nil {
 		// Другая ошибка, возможно проблема с правами доступа
 
-		return fmt.Errorf("не удалось проверить состояние базы данных: %v", err)
+		return fmt.Errorf("DB status check failed: %v", err)
 	}
 
 	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
-		return fmt.Errorf("невозможно открыть базу данных: %v", err)
+		return fmt.Errorf("failed to open DB: %v", err)
 	}
 
 	if install {
 		_, err = db.Exec(schema)
 		if err != nil {
-			return fmt.Errorf("ошибка выполнения schema: %v", err)
+			return fmt.Errorf("failed to execute schema: %v", err)
 		}
-		fmt.Println("Создание новой базы данных завершилось успешно.")
+		fmt.Println("new DB creation success")
 	}
 
 	return nil

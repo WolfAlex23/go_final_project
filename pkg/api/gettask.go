@@ -10,7 +10,7 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		writeJson(w, http.StatusInternalServerError, map[string]string{"error": "id должен быть заполнен"})
+		writeJson(w, http.StatusInternalServerError, map[string]string{"error": "id must be filled"})
 		return
 	}
 

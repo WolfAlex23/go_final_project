@@ -5,10 +5,12 @@ import (
 	"net/http"
 )
 
+const DateFormat = "20060102"
+
 func writeJson(w http.ResponseWriter, status int, data any) {
 	resp, err := json.Marshal(data)
 	if err != nil {
-		http.Error(w, "Ошибка маршализации JSON", http.StatusInternalServerError)
+		http.Error(w, "JSON marshal error", http.StatusInternalServerError)
 		return
 	}
 

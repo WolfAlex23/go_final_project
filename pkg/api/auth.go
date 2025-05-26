@@ -31,28 +31,28 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Ошибка чтения тела запроса: %v", err)})
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("failed to read request body: %v", err)})
 		return
 	}
 	if err = json.Unmarshal(buf.Bytes(), &input); err != nil {
-		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Ошибка десериализации JSON: %v", err)})
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("JSON unmarshal error: %v", err)})
 		return
 	}
 	inputPassword := input.Password
 
 	if len(inputPassword) == 0 {
-		writeJson(w, http.StatusUnauthorized, map[string]string{"error": "Пароль не введен"})
+		writeJson(w, http.StatusUnauthorized, map[string]string{"error": "no password input"})
 		return
 
 	}
 
 	envPassword := os.Getenv("TODO_PASSWORD")
 	if envPassword == "" {
-		writeJson(w, http.StatusUnauthorized, map[string]string{"error": "Аутентификация отключена"})
+		writeJson(w, http.StatusUnauthorized, map[string]string{"error": "authentication disabled"})
 		return
 	}
 	if inputPassword != envPassword {
-		writeJson(w, http.StatusUnauthorized, map[string]string{"error": "Неверный пароль"})
+		writeJson(w, http.StatusUnauthorized, map[string]string{"error": "wrong password"})
 		return
 	} else {
 
@@ -69,7 +69,7 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 		// получаем подписанный токен
 		signedToken, err := jwtToken.SignedString(secret)
 		if err != nil {
-			writeJson(w, http.StatusUnauthorized, map[string]string{"error": "Ошибка создания токена"})
+			writeJson(w, http.StatusUnauthorized, map[string]string{"error": "token sign malfunction"})
 			return
 		}
 		writeJson(w, http.StatusOK, map[string]string{"token": signedToken})
@@ -100,7 +100,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 
 			if !jwtToken.Valid {
 
-				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				http.Error(w, "invalid token", http.StatusUnauthorized)
 				return
 			}
 
@@ -108,7 +108,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			// обязательно используем второе возвращаемое значение ok и проверяем его, потому что
 			// если Сlaims вдруг окажется другого типа, мы получим панику
 			if !ok {
-				http.Error(w, "Failed to extract claims from the token", http.StatusInternalServerError)
+				http.Error(w, "failed to get claims from token", http.StatusInternalServerError)
 				return
 			}
 

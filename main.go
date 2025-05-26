@@ -18,13 +18,13 @@ func main() {
 
 	err := db.Init(dbPath)
 	if err != nil {
-		log.Fatalf("Не удалось подключиться к БД: %v", err)
+		log.Fatalf("DB connection failed: %v", err)
 
 	}
 
 	defer db.Close()
 
-	fmt.Println("Запускаем сервер")
+	fmt.Println("Server running")
 	api.Init()
 
 	err = server.Run()

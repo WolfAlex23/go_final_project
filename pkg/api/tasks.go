@@ -14,7 +14,7 @@ func tasksHandler(w http.ResponseWriter, r *http.Request) {
 
 	search := r.FormValue("search")
 
-	tasks, err := db.Tasks(search, 50) // в параметре максимальное количество записей
+	tasks, err := db.Tasks(search, 50)
 	if err != nil {
 		writeJson(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 

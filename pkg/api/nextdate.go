@@ -52,8 +52,8 @@ func monthCheck(idx []int, month int) bool {
 }
 
 func lastDayInMonth(date time.Time) int {
-	nextMonth := date.AddDate(0, 1, 0)                   // добавляем один месяц
-	lastDay := nextMonth.AddDate(0, 0, -nextMonth.Day()) // получаем первый день следующего месяца и возвращаемся обратно на последний день текущего месяца
+	nextMonth := date.AddDate(0, 1, 0)
+	lastDay := nextMonth.AddDate(0, 0, -nextMonth.Day())
 	return lastDay.Day()
 }
 

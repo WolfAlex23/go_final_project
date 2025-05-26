@@ -17,7 +17,6 @@ type Task struct {
 func AddTask(task *Task) (int64, error) {
 
 	var id int64
-	// определите запрос
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)`
 	res, err := db.Exec(query,
 		sql.Named("date", task.Date),
@@ -102,8 +101,7 @@ func UpdateTask(task *Task) error {
 	if err != nil {
 		return fmt.Errorf("task update failed: %v", err)
 	}
-	// метод RowsAffected() возвращает количество записей к которым
-	// был применена SQL команда
+
 	count, err := res.RowsAffected()
 	if err != nil {
 		return err
@@ -131,7 +129,6 @@ func DeleteTask(id string) error {
 }
 
 func UpdateDate(next string, id string) error {
-	// параметры пропущены, не забудьте указать WHERE
 	query := `UPDATE scheduler SET date = :date WHERE id = :id`
 	res, err := db.Exec(query,
 		sql.Named("date", next),
@@ -139,8 +136,7 @@ func UpdateDate(next string, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to update task date: %v", err)
 	}
-	// метод RowsAffected() возвращает количество записей к которым
-	// был применена SQL команда
+
 	count, err := res.RowsAffected()
 	if err != nil {
 		return err
